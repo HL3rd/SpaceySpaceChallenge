@@ -72,7 +72,6 @@ extension ViewController {
                 self.collectionView.reloadData()
             }
         }
-        
     }
     
 }
@@ -99,6 +98,9 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         let pastLaunchCell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? LaunchCollectionViewCell
+        
+        let launch = launchesData[indexPath.item]
+        pastLaunchCell?.initializeLaunchCell(launchData: launch)
         
         return pastLaunchCell ?? UICollectionViewCell()
     }
