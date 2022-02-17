@@ -9,7 +9,12 @@ public final class PastLaunchesListQuery: GraphQLQuery {
   public let operationDefinition: String =
     """
     query pastLaunchesList($limit: Int!, $offset: Int!) {
-      launchesPast(limit: $limit, offset: $offset) {
+      launchesPast(
+        limit: $limit
+        offset: $offset
+        sort: "launch_date_local"
+        order: "desc"
+      ) {
         __typename
         launch_date_local
         launch_site {
@@ -47,7 +52,7 @@ public final class PastLaunchesListQuery: GraphQLQuery {
 
     public static var selections: [GraphQLSelection] {
       return [
-        GraphQLField("launchesPast", arguments: ["limit": GraphQLVariable("limit"), "offset": GraphQLVariable("offset")], type: .list(.object(LaunchesPast.selections))),
+        GraphQLField("launchesPast", arguments: ["limit": GraphQLVariable("limit"), "offset": GraphQLVariable("offset"), "sort": "launch_date_local", "order": "desc"], type: .list(.object(LaunchesPast.selections))),
       ]
     }
 

@@ -1,5 +1,5 @@
 query pastLaunchesList($limit: Int!, $offset: Int!){
-  launchesPast(limit: $limit, offset: $offset) {
+  launchesPast(limit: $limit, offset: $offset, sort: "launch_date_local", order: "desc") {
     launch_date_local
     launch_site {
       site_name_long
