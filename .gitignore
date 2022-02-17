@@ -38,5 +38,3 @@ build
 .build/
 rvm*
 web.rb
-/SpaceySpaceChallenge.xcodeproj/
-
