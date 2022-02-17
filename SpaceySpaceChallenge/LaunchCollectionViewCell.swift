@@ -104,7 +104,7 @@ class LaunchCollectionViewCell: UICollectionViewCell {
     func initializeLaunchCell(launchData: PastLaunchesListQuery.Data.LaunchesPast?) {
         
         let result = launchData?.resultMap
-        print("THE LAUNCH DATA: \(result)")
+        
         let missionName = (result?["mission_name"] as? String)
         let launchSite = result?["launch_site"] as? [String:Any?]
         let siteName = (launchSite?["site_name_long"] as? String)

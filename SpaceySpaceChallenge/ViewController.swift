@@ -63,7 +63,7 @@ extension ViewController {
         guard !launchesLoading else { return }
         
         launchesLoading = true
-                
+        
         Network.shared.apollo.fetch(query: PastLaunchesListQuery(limit: 10, offset: self.offset)) { result in
             
             guard let data = try? result.get().data?.launchesPast else {
@@ -110,6 +110,22 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
         pastLaunchCell?.initializeLaunchCell(launchData: launch)
         
         return pastLaunchCell ?? UICollectionViewCell()
+    }
+    
+    // Tapped a cell to view video
+    // TODO: Add buttons and delegates to trigger article reading
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        
+        
+        let launch = launchesData[indexPath.item]
+        let links = launch?.resultMap["links"] as? [String:Any?]
+        let videoStr = links?["video_link"] as? String ?? ""
+
+        guard let url = URL(string: videoStr) else { return }
+
+        DispatchQueue.main.async {
+            UIApplication.shared.open(url)
+        }
     }
     
     // Prevents premature pagination / many ca;;s
