@@ -18,6 +18,11 @@ class ViewController: UIViewController {
         cv.backgroundColor = .red
         return cv
     }()
+    
+    // Data vars
+    var offset: Int = 0
+    var launchesData: [PastLaunchesListQuery.Data.LaunchesPast?] = []
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,7 +32,9 @@ class ViewController: UIViewController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
+        
         collectionView.frame = view.bounds
+        loadPastLaunchesData()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -47,6 +54,29 @@ class ViewController: UIViewController {
 
 }
 
+// Queries extension, TODO: Refactor
+extension ViewController {
+    
+    private func loadPastLaunchesData() {
+                
+        Network.shared.apollo.fetch(query: PastLaunchesListQuery(limit: 10, offset: self.offset)) { result in
+            
+            guard let data = try? result.get().data?.launchesPast else {
+                print("Error with PastLaunchesListQuery: \(result)")
+                return
+            }
+            
+            self.launchesData.append(contentsOf: data)
+            self.offset += 10
+            DispatchQueue.main.async {
+                self.collectionView.reloadData()
+            }
+        }
+        
+    }
+    
+}
+
 
 // CollectionView extensions, TODO: Refactor
 extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
@@ -62,7 +92,7 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
     // Method that states how many cells to generate
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
-        return 3
+        return launchesData.count
     }
     
     // Method that sets up photo collectionViewCell
