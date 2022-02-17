@@ -20,6 +20,7 @@ class ViewController: UIViewController {
     }()
     
     // Data vars
+    var launchesLoading = false
     var offset: Int = 0
     var launchesData: [PastLaunchesListQuery.Data.LaunchesPast?] = []
     
@@ -58,11 +59,16 @@ class ViewController: UIViewController {
 extension ViewController {
     
     private func loadPastLaunchesData() {
+        
+        guard !launchesLoading else { return }
+        
+        launchesLoading = true
                 
         Network.shared.apollo.fetch(query: PastLaunchesListQuery(limit: 10, offset: self.offset)) { result in
             
             guard let data = try? result.get().data?.launchesPast else {
                 print("Error with PastLaunchesListQuery: \(result)")
+                self.launchesLoading = false
                 return
             }
             
@@ -70,6 +76,7 @@ extension ViewController {
             self.offset += 10
             DispatchQueue.main.async {
                 self.collectionView.reloadData()
+                self.launchesLoading = false
             }
         }
     }
@@ -105,5 +112,27 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
         return pastLaunchCell ?? UICollectionViewCell()
     }
     
+    // Prevents premature pagination / many ca;;s
+    private func launchesAreLoading() -> Bool {
+        return (launchesLoading && launchesData.isEmpty)
+    }
+    
+    // For pagination
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        
+        if (launchesAreLoading()) { return }
+        
+        let offset = scrollView.contentOffset
+        let bounds = scrollView.bounds
+        let size = scrollView.contentSize
+        let inset = scrollView.contentInset
+        let y = offset.y + bounds.size.height - inset.bottom
+        let h = size.height
+        let reload_distance:CGFloat = 10.0
+        
+        if y > (h + reload_distance) {
+            loadPastLaunchesData()
+        }
+    }
 }
 
