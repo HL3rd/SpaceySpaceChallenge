@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SDWebImage
 
 class LaunchCollectionViewCell: UICollectionViewCell {
     
@@ -78,7 +79,7 @@ class LaunchCollectionViewCell: UICollectionViewCell {
             thumbnailImageView.widthAnchor.constraint(equalToConstant: frame.width * 0.20),
             thumbnailImageView.heightAnchor.constraint(equalToConstant: frame.width * 0.20),
             
-            patchImageView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10),
+            patchImageView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
             patchImageView.topAnchor.constraint(equalTo: thumbnailImageView.topAnchor),
             patchImageView.widthAnchor.constraint(equalToConstant: 20),
             patchImageView.heightAnchor.constraint(equalToConstant: 20),
@@ -86,13 +87,13 @@ class LaunchCollectionViewCell: UICollectionViewCell {
             missionLabel.leadingAnchor.constraint(equalTo: thumbnailImageView.trailingAnchor, constant: 15),
             missionLabel.topAnchor.constraint(equalTo: thumbnailImageView.topAnchor, constant: 10),
             missionLabel.trailingAnchor.constraint(equalTo: patchImageView.leadingAnchor, constant: -10),
-            missionLabel.heightAnchor.constraint(equalToConstant: frame.height * 0.15),
             
             launchSiteLabel.topAnchor.constraint(equalTo: missionLabel.bottomAnchor, constant: 10),
             launchSiteLabel.leadingAnchor.constraint(equalTo: missionLabel.leadingAnchor),
+            launchSiteLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
             
-            launchDateLabel.centerYAnchor.constraint(equalTo: launchSiteLabel.centerYAnchor),
-            launchDateLabel.leadingAnchor.constraint(equalTo: launchSiteLabel.trailingAnchor, constant: 10),
+            launchDateLabel.topAnchor.constraint(equalTo: launchSiteLabel.bottomAnchor, constant: 10),
+            launchDateLabel.leadingAnchor.constraint(equalTo: launchSiteLabel.leadingAnchor),
             
         ].forEach {
             $0.isActive = true
@@ -116,13 +117,19 @@ class LaunchCollectionViewCell: UICollectionViewCell {
         launchDateLabel.text = launchDate ?? ""
         
         let links = result?["links"] as? [String:Any?]
-        let _ = links?["mission_patch_small"] as? String
-        let _ = links?["video_link"] as? String
+        let missionUrl = links?["mission_patch_small"] as? String ?? "https://www.spacex.com/static/images/share.jpg"
         
+        let patchSize = CGSize(width: 100, height: 100)
+        patchImageView.sd_setImage(with: URL(string: missionUrl), placeholderImage: nil, options: [], context: [.imageThumbnailPixelSize : patchSize], progress: nil)
+        
+        let videoStr = links?["video_link"] as? String ?? ""
+        let thumbnailStr = getThumbnailUrl(videoLink: videoStr) ?? "https://www.spacex.com/static/images/share.jpg"
+        let thumbnailSize = CGSize(width: 200, height: 200)
+        thumbnailImageView.sd_setImage(with: URL(string: thumbnailStr), placeholderImage: nil, options: [], context: [.imageThumbnailPixelSize : thumbnailSize], progress: nil)
         
     }
     
-    func timeStringToDateString(myDateString: String) -> String? {
+    private func timeStringToDateString(myDateString: String) -> String? {
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss-mm:ss"
@@ -136,5 +143,16 @@ class LaunchCollectionViewCell: UICollectionViewCell {
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         let finalDateStr = dateFormatter.string(from: date)
         return finalDateStr
+    }
+    
+    private func getThumbnailUrl(videoLink: String) -> String? {
+        
+        let splitUrl = videoLink.components(separatedBy: "/")
+        guard let id = splitUrl.last else {
+            return nil
+        }
+        let thumbnailStr = "https://img.youtube.com/vi/\(id)/maxresdefault.jpg"
+        
+        return thumbnailStr
     }
 }

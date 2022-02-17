@@ -15,7 +15,7 @@ class ViewController: UIViewController {
         layout.scrollDirection = .vertical
         let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
         cv.showsVerticalScrollIndicator = true
-        cv.backgroundColor = .red
+        cv.backgroundColor = .white
         return cv
     }()
     
